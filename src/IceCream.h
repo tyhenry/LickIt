@@ -14,7 +14,7 @@ static const int N_MELT_IMAGES = 75;
 static const int N_REFILL_IMAGES = 14;
 static const int N_CHOCOPOUR_IMAGES = 22;
 static const int N_CHOCOLICK_IMAGES = 3;
-static const int N_WIN_IMAGES = 17;
+//static const int N_WIN_IMAGES = 17;
 // sprites
 static const int N_SPRINKLE_SPRITES = 4;
 
@@ -31,25 +31,39 @@ public:
 	
     IceCream();
 	void update();
-    void draw();
-	void drawRefill();
-	
+	bool checkCollision(ofVec2f pos);
 	void lick();	// increase lickState, trigger animation
 	
-	
-	bool checkCollision(ofVec2f pos);
-	void drawColliders();	// debug
-	
-	void setFrameBounds(ofRectangle bounds);
-	
-	void refill(float animDur);
+	void refill();
 	void resetMelt();
 	void startMelt(float timerSecs);
-	void addChocolate();	// triggers pour animation
+	
+	void addChocolate() { bHasChocolate = true; }	// triggers pour animation
 	void addSprinkles(int num = 30);
+	
+	void setFrameBounds(ofRectangle bounds) {
+		frameBounds = bounds;
+	}
+	void setAnimFps(float fps) {
+		animFrameDur = 1.f / ofClamp(fps, .1f, 60.f);
+	}
+
+    void draw();
+	void drawSprinkles();
+	void drawColliders();	// debug
 	
 	void loadAssets();
 	
+	void reset();
+	
+	bool isFilled() { return bIsFilled; }		// refill animation complete
+	bool isReady() {
+		bool b = isFilled();
+		if (bHasChocolate) b = b && bChocoPoured;	// refilled with chocolate
+		return b;
+	}
+	
+	void pause(bool enable) { bPaused = enable; }
 	
 	// position
 	ofVec2f origPos;
@@ -62,6 +76,8 @@ public:
 	// colliders
 	vector<pair<ofRectangle, bool>> colliders;	// collider, on/off
 	
+	ofColor iceCreamTint = ofColor(255);
+	
 	// melt timing
 	float meltStartedTime;
 	float meltDuration;
@@ -72,6 +88,7 @@ public:
 	int refillIdx = -1;
 	int chocoPourIdx = -1;
 	int chocoLickIdx = -1;
+	int winIdx = -1;
 	
 	float animFrameDur;
 	float lastAnimFrameT;
@@ -82,6 +99,8 @@ public:
 	
 	bool bDripDeath;	// lose
 	bool bAteCone;		// win
+	
+	bool bIsFilled, bChocoPoured, bPaused;
 	
 	int lickState;	// # licks (0-10)
 	int lickMax;	// 10 total licks
@@ -99,7 +118,7 @@ public:
 	ofImage chocoPourAnimation[N_CHOCOPOUR_IMAGES];	// chocolate pour
 	ofImage chocoLickAnimation[N_CHOCOLICK_IMAGES];
 	
-	ofImage winAnimation[N_WIN_IMAGES];		// win level star
+//	ofImage winAnimation[N_WIN_IMAGES];		// win level star
 	
 	ofImage sprinkleSprites[N_SPRINKLE_SPRITES];
 	vector<pair<int, ofVec2f>> sprinkles;	// sprite idx, pos
@@ -107,31 +126,34 @@ public:
 	ofImage coneImg;
 	ofImage coneFrontImg;
 	
+	// TODO: move win / lose anim to ofApp?
+	ofSoundPlayer winSound;
+	ofSoundPlayer loseSound;
 	
-    void melt();
-//    void move();
-    void drawSprinkles();
-    void drawChoco();
-    void flow();
 	
-    //gameLevel 1 = level1
-    void level1();
-    //gameLevel 3 = level2
-    void level2();
-    //gameLevel 6 = level3
-    void level3();
-    //gameLevel 7 = level4
-    void level4();
-    
-    void level8();
-    
-    void win();
-    
-    void brainFreeze();
-    //resetting level data/ positioning ice cream in middle
-    void reset();
-    //when lose, resetting the whole game to level 0
-    void resetWholeGame();
+//    void melt();
+////    void move();
+//    void drawSprinkles();
+//    void drawChoco();
+//    void flow();
+//
+//    //gameLevel 1 = level1
+//    void level1();
+//    //gameLevel 3 = level2
+//    void level2();
+//    //gameLevel 6 = level3
+//    void level3();
+//    //gameLevel 7 = level4
+//    void level4();
+//
+//    void level8();
+//
+//    void win();
+	
+//    void brainFreeze();
+//
+//    //when lose, resetting the whole game to level 0
+//    void resetWholeGame();
     //void win();
     
    // bool won = false;
@@ -173,7 +195,4 @@ public:
 //
 ////    bool dripDeath = false;
 //    bool won = false;
-	
-    ofSoundPlayer winSound;
-    ofSoundPlayer loseSound;
 };

@@ -16,14 +16,28 @@ public:
     Tongue();
     void update(float _posX, float _posY);
     void draw();
+	
+	void setLerp(ofVec2f lerpPct) {
+		lerp = lerpPct;
+	}
+	
+	bool isLicking() {
+		return (pos.y < prevPos.y) && (pos.x > prevPos.x - 10) && (pos.x < prevPos.x + 10);
+	}
+	bool isMovingDown() {
+		return (pos.y > prevPos.y + 15.f);	// TODO: make adjustable?
+	}
     
     ofVec2f pos;
     ofVec2f prevPos; //last frame
+
+protected:
     
-    bool isLicking = false;
-    bool isMovingDown = false;
+    bool bLicking = false;
+    bool bMovingDown = false;
 	
 	float lastHighestYPos = 0;
+	ofVec2f lerp;
     
     
 };

@@ -24,12 +24,25 @@
 #define CROP_LEFT 100
 #define CROP_RIGHT 540
 
+static const int N_WIN_IMAGES = 17;
+
+struct Level {
+	int levelN = 0;
+	ofVec2f tongueVel = ofVec2f(0.f);
+	float meltDuration = 5.f;	// seconds
+	bool bHasChocolate = false;
+	int numSprinkles = 0;
+	ofColor iceCreamTint = ofColor(255);
+};
+
 class ofApp : public ofBaseApp{
     
 public:
     void setup();
     void update();
     void draw();
+	
+	void restart();
 	
 	// param listeners
 	void lickVolumeChanged(float& vol);
@@ -45,21 +58,25 @@ public:
     void windowResized(int w, int h);
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
+	
+	ofTrueTypeFont font;
     
     Background bg;
     IceCream iceCream;
     UI teeth;
+	
+	vector<Level> levels;
     
     Tongue tongue;
     //bool gotLick = false;
     
     ofxKinect kinect;
 	
-	int icLevelNum = 0;
+	int levelNum = 0;
 	int winDuration = 120;
+	int lickCounter = 0;
 	
-	bool bIsLicking;
-	
+	bool bIsLicking, bLevelIntro, bDrawWin, bDrawLevelTitle, bGameOver;
 	
 	// OPENCV
     
@@ -79,8 +96,19 @@ public:
     
 	// AUDIO
 	
-    ofSoundPlayer lickSound;
+	ofSoundPlayer lickSound, winSound, gameOverSound;
     ofSoundPlayer music;
+	
+	// ANIMATIONS
+	
+	float lastAnimFrameT = 0.f;
+	float animFrameDur = 1.f / 24.f;
+	
+	ofImage winAnimation[N_WIN_IMAGES];		// win level star
+	int winIdx = -1;
+	
+	float levelTitleStartT = 0.f;
+	float levelTitleDur = 1.f;				// seconds
 	
 	// PARAMS
 	
@@ -96,7 +124,7 @@ public:
 	
 	ofParameterGroup vizParams;
 	ofParameter<float> bgFps;
-	ofParameter<bool> bDrawTongueTip;
+	ofParameter<bool> bDrawTongueTip, bDrawColliders;
 	
 	bool bHasKinect, bDrawGui;
     

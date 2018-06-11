@@ -15,8 +15,8 @@ UI::UI(){
 	
 	// close animation
 	for (int i=0; i<N_CLOSE_IMGS; i++){
-		string imgNum = ofToString(i);
-		closeAnimation[i].load("UI/close_" + imgNum + ".png");
+		string imgNum = ofToString(i, 2, '0');
+		closeAnimation[i].load("UI/close_" + imgNum  + ".png");
 	}
 	
 	closeFrameDelay = 1.f / 24.f;
