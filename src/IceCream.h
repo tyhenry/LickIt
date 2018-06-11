@@ -8,17 +8,23 @@
 
 #include "ofMain.h"
 
+// animations
 static const int N_ICECREAM_IMAGES  = 75;
 static const int N_MELT_IMAGES = 75;
-static const int N_REFILL_IMAGES = 14;	// REFILL
+static const int N_REFILL_IMAGES = 14;
 static const int N_CHOCOPOUR_IMAGES = 22;
 static const int N_CHOCOLICK_IMAGES = 3;
 static const int N_WIN_IMAGES = 17;
+// sprites
+static const int N_SPRINKLE_SPRITES = 4;
 
-static const int N_SPRINKLE_SPRITES = 4; // sprinkle sprites
+// scaling from images
+static const float CONE_SCALE = 0.5f;
 static const float SPRINKLE_SCALE = 0.6f;
 
-static const float CONE_SCALE = 0.5f;
+
+
+
 
 class IceCream {
 public:
@@ -26,13 +32,23 @@ public:
     IceCream();
 	void update();
     void draw();
+	void drawRefill();
+	
+	void lick();	// increase lickState, trigger animation
+	
 	
 	bool checkCollision(ofVec2f pos);
 	void drawColliders();	// debug
 	
 	void setFrameBounds(ofRectangle bounds);
 	
-	void resetMeltTimer(float secs);
+	void refill(float animDur);
+	void resetMelt();
+	void startMelt(float timerSecs);
+	void addChocolate();	// triggers pour animation
+	void addSprinkles(int num = 30);
+	
+	void loadAssets();
 	
 	
 	// position
@@ -51,7 +67,28 @@ public:
 	float meltDuration;
 	bool bMelting;
 	
-	bool bDripDeath;
+	// animation indices, -1 == off
+	int meltIdx = -1;
+	int refillIdx = -1;
+	int chocoPourIdx = -1;
+	int chocoLickIdx = -1;
+	
+	float animFrameDur;
+	float lastAnimFrameT;
+	
+	// toppings
+	bool bHasChocolate;
+	bool bHasSprinkles;
+	
+	bool bDripDeath;	// lose
+	bool bAteCone;		// win
+	
+	int lickState;	// # licks (0-10)
+	int lickMax;	// 10 total licks
+	int lickAnimIdx;
+	int lickAnimLen;
+	int lickAnimEnd;
+//	float lickAnimFps;
 	
 	
 	// images
@@ -64,15 +101,15 @@ public:
 	
 	ofImage winAnimation[N_WIN_IMAGES];		// win level star
 	
-	ofImage sprinkles[N_SPRINKLE_SPRITES];
-	ofVec2f sprinklesPos[N_SPRINKLE_SPRITES];
+	ofImage sprinkleSprites[N_SPRINKLE_SPRITES];
+	vector<pair<int, ofVec2f>> sprinkles;	// sprite idx, pos
 	
 	ofImage coneImg;
 	ofImage coneFrontImg;
 	
 	
     void melt();
-    void move();
+//    void move();
     void drawSprinkles();
     void drawChoco();
     void flow();
@@ -98,51 +135,45 @@ public:
     //void win();
     
    // bool won = false;
-    bool brainFrozen = false;
-    bool gotLick = false;
-    bool flowing = true;
-    int meltIndex = 0;
-    int lickIndex = 0;
-    int flowIndex = 0;
-    int winkIndex = 0;
-    
-    int chocoIndex = 0;
-    int chocoSpeed = 9;
-    
-
-    
-
+//    bool brainFrozen = false;
+//    bool gotLick = false;
+//    bool flowing = true;
+////    int meltIndex = 0;
+//    int lickIndex = 0;
+//    int flowIndex = 0;
+//    int winkIndex = 0;
+//
+//    int chocoIndex = 0;
+//    int chocoSpeed = 9;
 	
-    float moveIncrement = 5;
-    
-    //sprinkles position
-
-    
-    //ice cream colliders, 0-3
-    ofRectangle icLevels[4];
-    int lvlX[4]; // x offset
-    
-    int lickState = 0; // 0-10 (# of licks)
-    
-    //keyframes of icecream disappearance: 29, 38, 43, 47, 51, 56, 60, 64, 69, 77
-    
-    bool progressLevel = false;
-    int gameLevel = 0;
-    
-    int speedLimit = 200;
-    int savedLickFrame;
-    int currentLickFrame;
-    
-    int meltRate = 15;
-    
-    int coneAlignment = 3;
-    //////flowAlignment needs to be fudged around with
-    int flowAlignment = 30;
-    int flowSpeed = 10;
-    
-//    bool dripDeath = false;
-    bool won = false;
-    
+//    float moveIncrement = 5;
+//
+//    //sprinkles position
+//
+//
+//    //ice cream colliders, 0-3
+//    ofRectangle icLevels[4];
+//    int lvlX[4]; // x offset
+//
+//    //keyframes of icecream disappearance: 29, 38, 43, 47, 51, 56, 60, 64, 69, 77
+//
+//    bool progressLevel = false;
+//    int gameLevel = 0;
+//
+//    int speedLimit = 200;
+//    int savedLickFrame;
+//    int currentLickFrame;
+//
+//    int meltRate = 15;
+//
+//    int coneAlignment = 3;
+//    //////flowAlignment needs to be fudged around with
+//    int flowAlignment = 30;
+//    int flowSpeed = 10;
+//
+////    bool dripDeath = false;
+//    bool won = false;
+	
     ofSoundPlayer winSound;
     ofSoundPlayer loseSound;
 };

@@ -58,6 +58,8 @@ public:
 	int icLevelNum = 0;
 	int winDuration = 120;
 	
+	bool bIsLicking;
+	
 	
 	// OPENCV
     

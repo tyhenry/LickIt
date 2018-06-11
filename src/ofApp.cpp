@@ -6,6 +6,9 @@ void ofApp::setup(){
 	ofBackground(0);
 	ofSetVerticalSync(true);
 	
+	// game state
+	bIsLicking = false;
+	
 	
     // KINECT SETUP
     
@@ -186,31 +189,27 @@ void ofApp::update(){
     // update tongue coordinates
     tongue.update(tonguePos.x,tonguePos.y);
     
-    // check if tongue is giving a lick ;)
+    // check if tongue is giving a lick
     if (tongue.isLicking){
         
         // if hasn't gotten ice cream yet on this lick
-        if (iceCream.gotLick == false){
+        if (!bIsLicking){
             
             /* check if tongue is touching ice cream */
-            if (iceCream.collision(tongue.pos)){
+            if (iceCream.checkCollision(tongue.pos)){
 				
-				iceCream.lickState++;
-                cout << "licked ice cream: " << iceCream.lickState << endl;
-				
-                iceCream.gotLick = true;
+				iceCream.lick();
+//				iceCream.lickState++;
+//                cout << "licked ice cream: " << iceCream.lickState << endl;
+//				
+//                iceCream.gotLick = true;
+				bIsLicking == true;
                 lickSound.play();
             }
-            else {
-                iceCream.gotLick = false;
-            }
-            
         }
         
     } else if (tongue.isMovingDown){
-        
-        iceCream.gotLick = false;
-        
+		bIsLicking = false;
     }
     
     
@@ -223,11 +222,11 @@ void ofApp::draw(){
 	
 	// ICE CREAM
 	// TODO: SEPARATE LEVEL LOGIC FROM DRAW FUNCTIONS
-	// (IceCream should save level state in update)
+	// (IceCream should save state in update)
 	
 	if (iceCream.gameLevel == 0 ||iceCream.gameLevel == 2||iceCream.gameLevel == 4 || iceCream.gameLevel ==6){
 		iceCream.flowing = true;
-		iceCream.dripDeath = false;
+		iceCream.bDripDeath = false;
 	}
 	if (iceCream.gameLevel >= 8){
 		iceCream.gameLevel = 0;
