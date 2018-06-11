@@ -19,11 +19,23 @@ UI::UI(){
 		closeAnimation[i].load("UI/close_" + imgNum  + ".png");
 	}
 	
-	closeFrameDelay = 1.f / 24.f;
+	closeFrameDelay = 1.f / 8.f;
 }
 
 void UI::update(){
-
+	
+	if (!bMouthClosed && closeIndex >= 0){
+		float t = ofGetElapsedTimef();
+		if (t - closeFrameDelay >= tLastCloseFrame){
+			++closeIndex;
+			tLastCloseFrame = t;
+			if (closeIndex >= N_CLOSE_IMGS){
+				closeIndex = N_CLOSE_IMGS - 1;
+				bMouthClosed = true;
+				cout << "mouth closed" << endl;
+			}
+		}
+	}
 }
 
 void UI::draw(){
@@ -44,13 +56,6 @@ void UI::draw(){
 	}
 	else {
 		// draw mouth closing
-		float t = ofGetElapsedTimef();
-		if (t - closeFrameDelay >= tLastCloseFrame){
-			tLastCloseFrame = t;
-			if (++closeIndex >= N_CLOSE_IMGS){
-				closeIndex = -1;
-			}
-		}
 		if (closeIndex >= 0){
 			auto& img = closeAnimation[closeIndex];
 			img.draw(0,0, wS.x,img.getHeight() * scaleFactor);

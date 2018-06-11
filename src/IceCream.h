@@ -19,10 +19,8 @@ static const int N_CHOCOLICK_IMAGES = 3;
 static const int N_SPRINKLE_SPRITES = 4;
 
 // scaling from images
-static const float CONE_SCALE = 0.5f;
+static const float CONE_SCALE = 0.55f;
 static const float SPRINKLE_SCALE = 0.6f;
-
-
 
 
 

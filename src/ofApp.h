@@ -29,7 +29,7 @@ static const int N_WIN_IMAGES = 17;
 struct Level {
 	int levelN = 0;
 	ofVec2f tongueVel = ofVec2f(0.f);
-	float meltDuration = 5.f;	// seconds
+	float meltDuration = 10.f;	// seconds
 	bool bHasChocolate = false;
 	int numSprinkles = 0;
 	ofColor iceCreamTint = ofColor(255);

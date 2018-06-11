@@ -12,7 +12,7 @@ IceCream::IceCream(){
     size.y = iceCreamAnimation[0].getHeight() * CONE_SCALE;
 	
     origPos.x = ofGetWidth() * 0.5f - size.x * 0.5f;
-    origPos.y = ofGetHeight() - size.y;
+	origPos.y = ofGetHeight() - size.y;// * 1.1f;
 	
 	pos = origPos;
 	
@@ -101,17 +101,16 @@ void IceCream::update(){
 		// increment melt
 		// check for drip death / game over
 		if (bMelting){
-			float t = ofGetElapsedTimef();
-			int meltIdx =
-			ofMap(t, meltStartedTime, meltStartedTime+meltDuration, 0, N_MELT_IMAGES, true);
-			if (meltIdx >= N_MELT_IMAGES){
-				meltIdx = N_MELT_IMAGES-1;
-				
-				bDripDeath = true;	// checked in ofApp for game over
-				ofLogNotice("IceCream") << "ice cream melted!" << endl;
+			if (!bDripDeath){
+				float t = ofGetElapsedTimef();
+				meltIdx =
+				ofMap(t, meltStartedTime, meltStartedTime+meltDuration, 0, N_MELT_IMAGES, true);
+				if (meltIdx >= N_MELT_IMAGES){
+					meltIdx = N_MELT_IMAGES-1;
+					bDripDeath = true;	// checked in ofApp for game over
+					ofLogNotice("IceCream") << "ice cream melted!" << endl;
+				}
 			}
-		} else {
-			meltIdx = -1;
 		}
 		
 		// animate licks
@@ -248,6 +247,7 @@ void IceCream::refill(){
 
 void IceCream::resetMelt(){
 	bMelting = false;
+	meltIdx = 0;
 	meltStartedTime = 0.f;
 	meltDuration = -1.f;
 }
@@ -283,14 +283,21 @@ void IceCream::draw(){
 	// empty / refilling
 	if (!isFilled()){
 		coneImg.draw(pos, size.x, size.y);	// empty cone
+		ofPushStyle();
+		ofSetColor(iceCreamTint);
 		if (refillIdx >= 0 && refillIdx < N_REFILL_IMAGES){
 			refillAnimation[refillIdx].draw(pos, size.x, size.y);
 		}
+		ofPopStyle();
 	}
 	
 	// ice cream
 	else {
+		ofPushStyle();
+		ofSetColor(iceCreamTint);
 		iceCreamAnimation[lickAnimIdx].draw(pos, size.x, size.y);
+		ofPopStyle();
+		coneFrontImg.draw(pos, size.x, size.y);
 	
 		if (isReady()) {
 			
@@ -305,8 +312,9 @@ void IceCream::draw(){
 		
 			if (bMelting){
 				// draw melt animation
-				if (meltIdx >=0 && meltIdx < N_MELT_IMAGES)
+				if (meltIdx >=0 && meltIdx < N_MELT_IMAGES) {
 					meltAnimation[meltIdx].draw(pos, size.x, size.y);
+				}
 			}
 		} else {
 			if (bHasChocolate) {
@@ -422,6 +430,10 @@ void IceCream::reset(){
 	
 	bIsFilled = false;
 	bChocoPoured = false;
+	
+	iceCreamTint = ofColor(255);
+	
+	bPaused = false;
 
 }
 

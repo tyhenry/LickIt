@@ -58,32 +58,33 @@ void ofApp::setup(){
 	// ADD LEVELS
 	
 	Level l0;
+	l0.meltDuration = 60.f;
 	levels.push_back(l0);
 	Level l1;
-	l1.tongueVel = ofVec2f(3.f, 0.f);
+	l1.tongueVel = ofVec2f(1.f, 0.f);
 	l1.levelN = 1;
 	levels.push_back(l1);
 	Level l2;
-	l2.tongueVel = ofVec2f(-3.f, 0.f);
-	l2.meltDuration = 4.f;
+	l2.tongueVel = ofVec2f(-1.f, 0.f);
+	l2.meltDuration = 7.f;
 	l2.bHasChocolate = true;
 	l2.levelN = 2;
 	levels.push_back(l2);
 	Level l3;
-	l3.tongueVel = ofVec2f(5.f, 0.f);
-	l3.meltDuration = 5.f;
+	l3.tongueVel = ofVec2f(2.f, 0.f);
+	l3.meltDuration = 6.f;
 	l3.numSprinkles = 15;
 	l3.levelN = 3;
 	levels.push_back(l3);
 	Level l4;
-	l4.tongueVel = ofVec2f(-5.f, 0.f);
-	l4.meltDuration = 4.f;
+	l4.tongueVel = ofVec2f(-2.f, 0.f);
+	l4.meltDuration = 5.f;
 	l4.bHasChocolate = true;
 	l4.numSprinkles = 15;
 	l4.levelN = 4;
 	levels.push_back(l4);
 	Level l5;
-	l5.tongueVel = ofVec2f(5.f, 2.f);
+	l5.tongueVel = ofVec2f(3.f, 1.f);
 	l5.meltDuration = 4.f;
 	l5.bHasChocolate = true;
 	l5.numSprinkles = 20;
@@ -92,8 +93,8 @@ void ofApp::setup(){
 	levels.push_back(l5);
 	for (int i=6; i<100; i++){
 		Level l;
-		l.tongueVel.x = ofMap(i, 6, 100, 5.f, 10.f);
-		l.tongueVel.y = ofMap(i, 6, 100, 2.f, 5.f);
+		l.tongueVel.x = ofMap(i, 6, 100, 3.f, 10.f);
+		l.tongueVel.y = ofMap(i, 6, 100, 1.f, 5.f);
 		if (i%2==0) l.tongueVel *= -1;	// reverse dir
 		l.meltDuration = ofMap(i, 6, 100, 4.f, 1.f);
 		l.bHasChocolate = true;
@@ -140,9 +141,13 @@ void ofApp::setup(){
 	musicVolume.addListener(this, &ofApp::musicVolumeChanged);
 	bgFps.addListener(this, &ofApp::bgFpsChanged);
 	
-	restart();
+	
+	// ICE CREAM
 	
 	iceCream.setAnimFps(6.f);
+	iceCream.setFrameBounds(ofRectangle(ofGetWidth() * .2, ofGetHeight() * -.2, ofGetWidth() * .8, ofGetHeight() * 1.2));
+	
+	restart();
 	
 }
 
@@ -255,16 +260,20 @@ void ofApp::update(){
 	if (iceCream.bAteCone){
 		
 		if (!bLevelIntro){
+			
+			bLevelIntro = true;
+			++levelNum;
+			
 			// player beat level, start win animation
 			bDrawWin = true;
 			winIdx = 0;
 			winSound.play();
 			lastAnimFrameT = ofGetElapsedTimef();
-			bLevelIntro = true;
-			++levelNum;
+			
 			if (levelNum >= levels.size()){
 				// win game?
 				restart();
+				
 			} else {
 				iceCream.refill();
 				// update iceCream with level settings
@@ -272,12 +281,22 @@ void ofApp::update(){
 				iceCream.vel = l.tongueVel;
 				if (l.bHasChocolate) iceCream.addChocolate();
 				iceCream.addSprinkles(l.numSprinkles);
+				iceCream.iceCreamTint = l.iceCreamTint;
 				iceCream.pause(true);
 			}
 		}
 	}
 	else if (iceCream.bDripDeath){
-		bGameOver = true;
+		if (!bGameOver){
+			iceCream.pause(true);
+			bGameOver = true;
+			teeth.beginClose(8.f);
+		} else {
+			if (teeth.bMouthClosed){
+				teeth.setMouthOpen(true);
+				restart();
+			}
+		}
 	}
 	
 	if (bLevelIntro) {
@@ -312,32 +331,36 @@ void ofApp::update(){
 			bLevelIntro = false;	// intro done
 		}
 	}
+	else if (!bGameOver) {
+		
+		// check if tongue is giving a lick
 
-    
-    // check if tongue is giving a lick
-	if (!bIsLicking){
-		if (tongue.isLicking()){
-			
-			/* check if tongue is touching ice cream */
-			if (iceCream.checkCollision(tongue.pos)){
+		if (!bIsLicking){
+			if (tongue.isLicking()){
 				
-				iceCream.lick();
-				++lickCounter;
-				bIsLicking = true;
-				lickSound.play();
-				
-				ofLogNotice("ofApp")	<< "licked!" << endl
-				<< "\t\t lick: " << iceCream.lickState << " / " << iceCream.lickMax
-				<< ", total licks: " << lickCounter;
+				/* check if tongue is touching ice cream */
+				if (iceCream.checkCollision(tongue.pos)){
+					
+					iceCream.lick();
+					++lickCounter;
+					bIsLicking = true;
+					lickSound.play();
+					
+					ofLogNotice("ofApp")	<< "licked!" << endl
+					<< "\t\t lick: " << iceCream.lickState << " / " << iceCream.lickMax
+					<< ", total licks: " << lickCounter;
+				}
 			}
 		}
+		else if (tongue.isMovingDown()){
+			bIsLicking = false;
+		}
 	}
-    else if (tongue.isMovingDown()){
-		bIsLicking = false;
-    }
 	
 	
 	iceCream.update();
+	
+	teeth.update();
 
     
 }
@@ -367,8 +390,6 @@ void ofApp::draw(){
 	// DRAW TEETH over ice cream
 	
     teeth.draw();
-	
-	
     
 	if (bDrawKinect){
 		grayImage.draw(10, 320, 400, 300);
@@ -416,6 +437,7 @@ void ofApp::restart(){
 	
 	winIdx = -1;
 	lickCounter = 0;
+	
 }
 
 //--------------------------------------------------------------

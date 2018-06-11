@@ -15,10 +15,18 @@ public:
     UI();
     void draw();
     void update();
-	void beginClose(float fps = 24.f) {
+	void beginClose(float fps = 8.f) {
 		closeFrameDelay = 1.f / ofClamp(fps, 0.1f, 60.f);
 		tLastCloseFrame = ofGetElapsedTimef();
 		closeIndex = 0;
+	}
+	void setMouthOpen(bool open) {
+		if (open){
+			closeIndex = -1;
+		} else {
+			closeIndex = N_CLOSE_IMGS - 1;
+		}
+		bMouthClosed = !open;
 	}
     
     ofImage lowerTeeth;
@@ -28,4 +36,5 @@ public:
 	int closeIndex = -1;
 	float tLastCloseFrame;
 	float closeFrameDelay;
+	bool bMouthClosed = false;
 };
