@@ -3,17 +3,12 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 	
-	ofBackground(0);
-	ofSetVerticalSync(true);
+	// KINECT SETUP
 	
-	// game state
-	bIsLicking = false;
-	levelNum = 0;
-	
-    // KINECT SETUP
-    
 	kinect.setRegistration(true);
-	bHasKinect = kinect.init() && kinect.open();
+	kinect.init();
+	kinect.open();
+	bHasKinect = kinect.isConnected();
 	
 	kinectNearThresh.set("kinect near thresh", 225, 0, 255);
 	kinectFarThresh.set("kinect far thresh", 147, 0, 255);
@@ -22,6 +17,14 @@ void ofApp::setup(){
 	bUseKinect.set("use kinect", bHasKinect);
 	bDrawKinect.set("draw kinect", false);
 	
+	
+	ofBackground(0);
+	ofSetVerticalSync(true);
+	
+	// game state
+	bIsLicking = false;
+	levelNum = 0;
+
 	
 	// OPEN CV
 	
@@ -122,6 +125,9 @@ void ofApp::setup(){
 	kinectParams.add(kinectFarThresh);
 	kinectParams.add(kinectRoiTL);
 	kinectParams.add(kinectRoiBR);
+	kinectParams.add(kinectMinDepth.set("kinect min depth", 1050, 0, 2000));
+	kinectParams.add(kinectMaxDepth.set("kinect max depth", 1800, 0, 2000));
+	kinectParams.add(bMouseControl.set("mouse control", !bHasKinect));
 	gui.add(kinectParams);
 	
 	soundParams.setName("SOUND PARAMS");
@@ -156,15 +162,12 @@ void ofApp::update(){
 
     bg.update();
     iceCream.update();
-
 	
-	// CONTROLLER POSITION
-
-    ofVec2f tonguePos = ofVec2f(ofGetMouseX(), ofGetMouseY());
+	ofVec2f tonguePos = tongue.pos;
 	
 	// USE KINECT IF ATTACHED
 	
-    if (bHasKinect){
+    if (bHasKinect && !bMouseControl){
         kinect.update();
         
         //tonguePos = kinect.tongueTip pos
@@ -234,7 +237,7 @@ void ofApp::update(){
 					
 					// TODO: move to params
 					tip.x = ofMap(tip.x, FULL_LEFT, FULL_RIGHT, 0, ofGetWidth(), true);
-					tip.y = ofMap(d, DEPTH_TOP, DEPTH_BOTTOM, 320, ofGetHeight(), true);
+					tip.y = ofMap(d, kinectMinDepth, kinectMaxDepth, 0, ofGetHeight(), true);
 					
 					tonguePos.set(tip);
 				}
@@ -251,7 +254,10 @@ void ofApp::update(){
 			}
         }
         
-    }
+	} else {
+		// mouse control
+		tonguePos = ofVec2f(ofGetMouseX(), ofGetMouseY());
+	}
     
     // update tongue coordinates
     tongue.update(tonguePos.x,tonguePos.y);

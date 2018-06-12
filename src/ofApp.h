@@ -41,6 +41,7 @@ public:
     void setup();
     void update();
     void draw();
+	void exit() { kinect.close(); }
 	
 	void restart();
 	
@@ -116,8 +117,9 @@ public:
 	ofParameterGroup kinectParams;
 	ofxLabel kinectStatusLabel;
 	ofParameter<int> kinectNearThresh, kinectFarThresh;
+	ofParameter<int> kinectMinDepth, kinectMaxDepth;
 	ofParameter<ofVec2f> kinectRoiTL, kinectRoiBR;
-	ofParameter<bool> bUseKinect, bDrawKinect;
+	ofParameter<bool> bUseKinect, bDrawKinect, bMouseControl;
 	
 	ofParameterGroup soundParams;
 	ofParameter<float> lickVolume, musicVolume;

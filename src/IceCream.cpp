@@ -411,6 +411,7 @@ void IceCream::reset(){
 	lickAnimEnd = ofMap(lickState, 0, lickMax, 0, N_ICECREAM_IMAGES-1, true);
 	
 	pos = origPos;
+	vel = ofVec2f(0.f);
 	bDripDeath = false;
 	bAteCone = false;
 	
