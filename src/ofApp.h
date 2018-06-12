@@ -49,6 +49,10 @@ public:
 	void lickVolumeChanged(float& vol);
 	void musicVolumeChanged(float& vol);
 	void bgFpsChanged(float& fps);
+	void frameBoundsChanged(glm::vec2& bounds) {
+		auto rect = ofRectangle(frameBoundsTL.get(), frameBoundsBR.get());
+		iceCream.setFrameBounds(rect);
+	}
     
     void keyPressed(int key);
     void keyReleased(int key);
@@ -114,21 +118,23 @@ public:
 	// PARAMS
 	
 	ofxPanel gui;
-	ofParameterGroup kinectParams;
+	ofParameterGroup controllerParams;
 	ofxLabel kinectStatusLabel;
 	ofParameter<int> kinectNearThresh, kinectFarThresh;
 	ofParameter<int> kinectMinDepth, kinectMaxDepth;
+	ofParameter<float> kinectMinX, kinectMaxX;
 	ofParameter<ofVec2f> kinectRoiTL, kinectRoiBR;
 	ofParameter<bool> bUseKinect, bDrawKinect, bMouseControl;
+	ofParameter<glm::vec2> controlBoundsTL, controlBoundsBR;
+	ofParameter<glm::vec2> frameBoundsTL, frameBoundsBR;
 	
 	ofParameterGroup soundParams;
 	ofParameter<float> lickVolume, musicVolume;
 	
 	ofParameterGroup vizParams;
 	ofParameter<float> bgFps;
-	ofParameter<bool> bDrawTongueTip, bDrawColliders;
+	ofParameter<bool> bDrawTongueTip;
 	
 	bool bHasKinect, bDrawGui;
     ofVec2f tonguePos;
-    bool useMouse = true;
 };

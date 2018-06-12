@@ -118,17 +118,23 @@ void ofApp::setup(){
 	gui.add(kinectStatusLabel.setup("kinect status", (bHasKinect ? "OK" : "NONE")));
 	kinectStatusLabel.setBackgroundColor(bHasKinect ? ofColor(0,75,25) : ofColor(75,0,25));
 	
-	kinectParams.setName("KINECT PARAMS");
-	kinectParams.add(bUseKinect);
-	kinectParams.add(bDrawKinect);
-	kinectParams.add(kinectNearThresh);
-	kinectParams.add(kinectFarThresh);
-	kinectParams.add(kinectRoiTL);
-	kinectParams.add(kinectRoiBR);
-	kinectParams.add(kinectMinDepth.set("kinect min depth", 1050, 0, 2000));
-	kinectParams.add(kinectMaxDepth.set("kinect max depth", 1800, 0, 2000));
-	kinectParams.add(bMouseControl.set("mouse control", !bHasKinect));
-	gui.add(kinectParams);
+	controllerParams.setName("CONTROLLER PARAMS");
+//	controllerParams.add(bUseKinect);
+	controllerParams.add(bMouseControl.set("mouse control", !bHasKinect));
+	controllerParams.add(bDrawKinect);
+	controllerParams.add(kinectNearThresh);
+	controllerParams.add(kinectFarThresh);
+//	controllerParams.add(kinectRoiTL);
+//	controllerParams.add(kinectRoiBR);
+	controllerParams.add(kinectMinDepth.set("kinect min depth", 1050, 0, 2000));
+	controllerParams.add(kinectMaxDepth.set("kinect max depth", 1800, 0, 2000));
+	controllerParams.add(kinectMinX.set("kinect min x", 240, 0, 640));
+	controllerParams.add(kinectMaxX.set("kinect max x", 440, 0, 640));
+	controllerParams.add(controlBoundsTL.set("control bounds TL", glm::vec2(0,200), glm::vec2(0,0), glm::vec2(ofGetWidth(),ofGetHeight())));
+	controllerParams.add(controlBoundsBR.set("control bounds BR", glm::vec2(ofGetWidth(),ofGetHeight()), glm::vec2(0,0), glm::vec2(ofGetWidth(),ofGetHeight())));
+	controllerParams.add(frameBoundsTL.set("ice cream bounds TL", glm::vec2(ofGetWidth()*.15f,0), glm::vec2(0,0), glm::vec2(ofGetWidth(),ofGetHeight())));
+	controllerParams.add(frameBoundsBR.set("ice cream bounds BR", glm::vec2(ofGetWidth()*.85f,ofGetHeight()), glm::vec2(0,0), glm::vec2(ofGetWidth(),ofGetHeight()+300)));
+	gui.add(controllerParams);
 	
 	soundParams.setName("SOUND PARAMS");
 	soundParams.add(lickVolume);
@@ -138,7 +144,6 @@ void ofApp::setup(){
 	vizParams.setName("VIZ PARAMS");
 	vizParams.add(bgFps.set("bg fps", 7.f, 0.1f, 60.f) );
 	vizParams.add(bDrawTongueTip.set("draw tongue tip", true));
-	vizParams.add(bDrawColliders.set("draw colliders", false));
 	gui.add(vizParams);
 	
 	// -- LISTENERS
@@ -146,12 +151,15 @@ void ofApp::setup(){
 	lickVolume.addListener(this, &ofApp::lickVolumeChanged);
 	musicVolume.addListener(this, &ofApp::musicVolumeChanged);
 	bgFps.addListener(this, &ofApp::bgFpsChanged);
-	
+	frameBoundsTL.addListener(this, &ofApp::frameBoundsChanged);	// ice cream bounce bounds
+	frameBoundsBR.addListener(this, &ofApp::frameBoundsChanged);
+
 	
 	// ICE CREAM
 	
 	iceCream.setAnimFps(6.f);
-	iceCream.setFrameBounds(ofRectangle(ofGetWidth() * .2, ofGetHeight() * -.2, ofGetWidth() * .8, ofGetHeight() * 1.2));
+	auto rect = ofRectangle(frameBoundsTL.get(), frameBoundsBR.get());
+	iceCream.setFrameBounds(rect);
 	
 	restart();
 	
@@ -164,21 +172,23 @@ void ofApp::update(){
     iceCream.update();
 	
 	// CONTROLLER POSITION
-
-    if(useMouse){
-        tonguePos = ofVec2f(ofGetMouseX(), ofGetMouseY());
-    }
-
-	// USE KINECT IF ATTACHED
 	
-    if (bHasKinect && !bMouseControl){
+    if (bMouseControl || !bHasKinect){
+		
+		// mouse control
+		tonguePos.x = ofClamp(ofGetMouseX(), controlBoundsTL.get().x, controlBoundsBR.get().x);
+		tonguePos.y = ofClamp(ofGetMouseY(), controlBoundsTL.get().y, controlBoundsBR.get().y);
+
+	} else {
+
+		// USE KINECT IF ATTACHED
+
         kinect.update();
         
         //tonguePos = kinect.tongueTip pos
         
         if(kinect.isFrameNew()) {
 
-            //grayImage.setFromPixels(kinect.getDepthPixels(), kinect.width, kinect.height);
 			grayImage.setFromPixels(kinect.getDepthPixels());
 			grayThreshNear = grayImage;
             grayThreshFar = grayImage;
@@ -240,27 +250,13 @@ void ofApp::update(){
 					//cout << ", raw tip x: " << tip.x << endl;
 					
 					// TODO: move to params
-					tip.x = ofMap(tip.x, FULL_LEFT, FULL_RIGHT, 0, ofGetWidth(), true);
-					tip.y = ofMap(d, kinectMinDepth, kinectMaxDepth, 0, ofGetHeight(), true);
+					tip.x = ofMap(tip.x, kinectMinX, kinectMaxX, controlBoundsTL.get().x, controlBoundsBR.get().x, true);
+					tip.y = ofMap(d, kinectMinDepth, kinectMaxDepth, controlBoundsTL.get().y, controlBoundsBR.get().y, true);
 					
 					tonguePos.set(tip);
 				}
-				
-//				} else {
-//
-//					ofPoint tip = contourFinder.blobs[0].centroid;
-//					// invert x
-//					tip.x = ofMap(tip.x, FULL_LEFT, FULL_RIGHT, ofGetWidth(), 0, true);
-//					tip.y = ofMap(tip.y, DEPTH_BOTTOM, DEPTH_TOP, ofGetHeight(), 0, true);
-//
-//					tonguePos.set(tip);
-//				}
 			}
         }
-        
-	} else {
-		// mouse control
-		tonguePos = ofVec2f(ofGetMouseX(), ofGetMouseY());
 	}
     
     // update tongue coordinates
@@ -402,12 +398,12 @@ void ofApp::draw(){
     teeth.draw();
     
 	if (bDrawKinect){
-		grayImage.draw(10, 320, 400, 300);
-		contourFinder.draw(10, 320, 400, 300);
-		//tongueOutline.draw();
-		tongueOutlineSmooth.draw();
+		
+		grayImage.draw(ofGetWidth()-480, 0, 480, 360);
+		contourFinder.draw(ofGetWidth()-480, 0, 480, 360);
+//		tongueOutlineSmooth.draw();
 		//ofSetColor(tipDepth, tipDepth, 0);
-		ofDrawCircle(tip, 5);
+//		ofDrawCircle(tip, 5);
 		//ofSetColor(255);
 	}
 	
@@ -421,15 +417,19 @@ void ofApp::draw(){
 
 		ofSetColor(255);
 	}
-	if (bDrawColliders){
-		iceCream.drawColliders();
-	}
-	
-	// TODO:  level display on screen
-//	cout << "game level: " <<iceCream.gameLevel<<endl;
 	
 	if (bDrawGui){
 		gui.draw();
+		
+		iceCream.drawColliders();
+		
+		// draw ice cream frame bounds
+		ofPushStyle();
+		ofNoFill();
+		ofSetColor(0,0,255);
+		ofDrawRectangle(iceCream.frameBounds);
+		ofDrawBitmapStringHighlight("ice cream bounds", iceCream.frameBounds.getTopLeft()+glm::vec2(0,20), ofColor(0,0,255));
+		ofPopStyle();
 	}
 }
 
@@ -470,27 +470,7 @@ void ofApp::bgFpsChanged(float& fps){
 void ofApp::keyPressed(int key){
     
     switch(key){
-            
-//        case ('1'):
-//            icLevelNum = 0;
-//            break;
-//        case ('2'):
-//            icLevelNum = 1;
-//            break;
-//        case ('3'):
-//            icLevelNum = 2;
-//            break;
-//        case ('4'):
-//            icLevelNum = 3;
-//            break;
-//            
-//        case (OF_KEY_UP):
-//            cout << "lvlX[" << icLevelNum << "] is " << ++(iceCream.lvlX[icLevelNum]) << endl;
-//            break;
-//        
-//        case (OF_KEY_DOWN):
-//            cout << "lvlX[" << icLevelNum << "] is " << --(iceCream.lvlX[icLevelNum]) << endl;
-//            break;
+		
 			
 		case ('f'):
 			ofToggleFullscreen();
@@ -501,47 +481,8 @@ void ofApp::keyPressed(int key){
 			break;
 			
         case ('m'):
-            useMouse = !useMouse;
+            bMouseControl = !bMouseControl;
             break;
-            
-			// REMOVED FOR GUI CONTROL:
-			
-//        case ('k'):
-//            if (bHasKinect){
-//                bDrawKinect = !bDrawKinect;
-//                cout << "draw kinect: " << bDrawKinect << endl;
-//            }
-//            break;
-			
-        // KINECT THRESHOLDING
-//        case ('='):
-//            kinectNearThresh++;
-//            if (kinectNearThresh > 255){
-//                kinectNearThresh = 255;
-//            }
-//            cout << "kinectNearThresh: " << kinectNearThresh << endl;
-//            break;
-//        case ('-'):
-//            kinectNearThresh--;
-//            if (kinectNearThresh < 0){
-//                kinectNearThresh = 0;
-//            }
-//            cout << "kinectNearThresh: " << kinectNearThresh << endl;
-//            break;
-//        case ('0'):
-//            kinectFarThresh++;
-//            if (kinectFarThresh > 255){
-//                kinectFarThresh = 255;
-//            }
-//            cout << "kinectFarThresh: " << kinectFarThresh << endl;
-//            break;
-//        case ('9'):
-//            kinectFarThresh--;
-//            if (kinectFarThresh < 0){
-//                kinectFarThresh = 0;
-//            }
-//            cout << "kinectFarThresh: " << kinectFarThresh << endl;
-//            break;
 
     }
 

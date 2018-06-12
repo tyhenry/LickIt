@@ -9,7 +9,7 @@
 #include "ofMain.h"
 
 // animations
-static const int N_ICECREAM_IMAGES  = 75;
+static const int N_ICECREAM_IMAGES = 24;
 static const int N_MELT_IMAGES = 75;
 static const int N_REFILL_IMAGES = 14;
 static const int N_CHOCOPOUR_IMAGES = 22;
@@ -19,7 +19,8 @@ static const int N_CHOCOLICK_IMAGES = 3;
 static const int N_SPRINKLE_SPRITES = 4;
 
 // scaling from images
-static const float CONE_SCALE = 0.55f;
+//static const float CONE_SCALE = 0.58f;
+static const float CONE_HEIGHT_PCT = 0.769f;	// pct of screen height
 static const float SPRINKLE_SCALE = 0.6f;
 
 

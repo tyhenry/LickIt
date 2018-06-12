@@ -8,11 +8,12 @@ IceCream::IceCream(){
 	
 	// POSITIONING
 	
-	size.x = iceCreamAnimation[0].getWidth() * CONE_SCALE;
-    size.y = iceCreamAnimation[0].getHeight() * CONE_SCALE;
+	size.y = ofGetHeight() * CONE_HEIGHT_PCT;
+	float scale = size.y / iceCreamAnimation[0].getHeight();
+	size.x = iceCreamAnimation[0].getWidth() * scale;
 	
     origPos.x = ofGetWidth() * 0.5f - size.x * 0.5f;
-	origPos.y = ofGetHeight() - size.y;// * 1.1f;
+	origPos.y = ofGetHeight() - size.y;
 	
 	pos = origPos;
 	
@@ -331,11 +332,12 @@ void IceCream::draw(){
 	
 	// ice cream
 	else {
+		coneImg.draw(pos, size.x, size.y);
+
 		ofPushStyle();
 		ofSetColor(iceCreamTint);
 		iceCreamAnimation[lickAnimIdx].draw(pos, size.x, size.y);
 		ofPopStyle();
-		coneFrontImg.draw(pos, size.x, size.y);
 	
 		if (isReady()) {
 			
@@ -352,7 +354,10 @@ void IceCream::draw(){
 			if (bMelting){
 				// draw melt animation
 				if (meltIdx >=0 && meltIdx < N_MELT_IMAGES) {
+					ofPushStyle();
+					ofSetColor(iceCreamTint);
 					meltAnimation[meltIdx].draw(pos, size.x, size.y);
+					ofPopStyle();
 				}
 			}
 		} else {
@@ -400,7 +405,7 @@ void IceCream::loadAssets(){
 	
 	// ice cream cone base
 	for(int i =0; i< N_ICECREAM_IMAGES; i++){
-		string file = "ice_cream_cone/ice_cream_cone_" + ofToString(i, 2, '0') + ".png";
+		string file = "ice_cream_cone/ice_cream_" + ofToString(i, 2, '0') + ".png";
 		iceCreamAnimation[i].load(file);
 	}
 	
