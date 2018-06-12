@@ -57,18 +57,22 @@ void ofApp::setup(){
 	for(int i =0; i < N_WIN_IMAGES; i++){
 		winAnimation[i].load("special_fx/wink_" + ofToString(i, 2, '0') + ".png");
 	}
+	// level title anim
+	for(int i =0; i < N_MORE_IMAGES; i++){
+		moreAnimation[i].load("level_title/more_" + ofToString(i, 2, '0') + ".png");
+	}
 	
 	// ADD LEVELS
 	
 	Level l0;
-	l0.meltDuration = 60.f;
+	l0.meltDuration = 194.5f;
 	levels.push_back(l0);
 	Level l1;
-	l1.tongueVel = ofVec2f(1.f, 0.f);
+	l1.tongueVel = ofVec2f(0.5f, 0.f);
 	l1.levelN = 1;
 	levels.push_back(l1);
 	Level l2;
-	l2.tongueVel = ofVec2f(-1.f, 0.f);
+	l2.tongueVel = ofVec2f(-0.5f, 0.f);
 	l2.meltDuration = 7.f;
 	l2.bHasChocolate = true;
 	l2.levelN = 2;
@@ -132,8 +136,8 @@ void ofApp::setup(){
 	controllerParams.add(kinectMaxX.set("kinect max x", 440, 0, 640));
 	controllerParams.add(controlBoundsTL.set("control bounds TL", glm::vec2(0,200), glm::vec2(0,0), glm::vec2(ofGetWidth(),ofGetHeight())));
 	controllerParams.add(controlBoundsBR.set("control bounds BR", glm::vec2(ofGetWidth(),ofGetHeight()), glm::vec2(0,0), glm::vec2(ofGetWidth(),ofGetHeight())));
-	controllerParams.add(frameBoundsTL.set("ice cream bounds TL", glm::vec2(ofGetWidth()*.15f,0), glm::vec2(0,0), glm::vec2(ofGetWidth(),ofGetHeight())));
-	controllerParams.add(frameBoundsBR.set("ice cream bounds BR", glm::vec2(ofGetWidth()*.85f,ofGetHeight()), glm::vec2(0,0), glm::vec2(ofGetWidth(),ofGetHeight()+300)));
+	controllerParams.add(frameBoundsTL.set("ice cream bounds TL", glm::vec2(ofGetWidth()*.15f,ofGetHeight()*.2314f), glm::vec2(0,0), glm::vec2(ofGetWidth(),ofGetHeight())));
+	controllerParams.add(frameBoundsBR.set("ice cream bounds BR", glm::vec2(ofGetWidth()*.85f,ofGetHeight()*1.1f), glm::vec2(0,0), glm::vec2(ofGetWidth(),ofGetHeight()+300)));
 	gui.add(controllerParams);
 	
 	soundParams.setName("SOUND PARAMS");
@@ -153,7 +157,12 @@ void ofApp::setup(){
 	bgFps.addListener(this, &ofApp::bgFpsChanged);
 	frameBoundsTL.addListener(this, &ofApp::frameBoundsChanged);	// ice cream bounce bounds
 	frameBoundsBR.addListener(this, &ofApp::frameBoundsChanged);
-
+	
+	
+	// UI
+	
+	font.load(ofToDataPath("SFCompactRounded-Semibold.otf"), 48);
+	levelTitleDur = 4.f;
 	
 	// ICE CREAM
 	
@@ -299,6 +308,9 @@ void ofApp::update(){
 			teeth.beginClose(8.f);
 		} else {
 			if (teeth.bMouthClosed){
+				
+				// TODO: init game over screen
+				
 				teeth.setMouthOpen(true);
 				restart();
 			}
@@ -319,10 +331,12 @@ void ofApp::update(){
 					levelTitleStartT = t;
 					bDrawWin = false;
 					bDrawLevelTitle = true;
+					moreIdx = 0;
 				}
 				lastAnimFrameT = t;
 			}
 		} else if (bDrawLevelTitle){
+			moreIdx = ofMap(t, levelTitleStartT, levelTitleStartT + levelTitleDur, 0, N_MORE_IMAGES-1, true);
 			if (t - levelTitleDur >= levelTitleStartT){
 				bDrawLevelTitle = false;
 			}
@@ -385,9 +399,21 @@ void ofApp::draw(){
 	}
 	else if (bDrawLevelTitle){
 		
-		// TODO: replace with TTF
-		ofDrawBitmapStringHighlight("LEVEL " + ofToString(levelNum), ofGetWidth()*.5, ofGetHeight()*.5);
+		if (moreIdx >= 0 && moreIdx < N_MORE_IMAGES){
+			moreAnimation[moreIdx].draw(0,0,ofGetWidth(), ofGetHeight());
+		}
 		
+		ofPushStyle();
+		ofColor c = ofColor::fromHex(0x5c3317);
+		c.a = ofMap(moreIdx, float(N_MORE_IMAGES) * .33f, float(N_MORE_IMAGES) * .66f, 0, 255, true);
+		ofSetColor(c);
+		string levelStr = "Level " + ofToString(levelNum+1) + "!";
+		glm::vec2 levelTitlePos;
+		levelTitlePos.x = ofGetWidth() * 0.5f - font.stringWidth(levelStr) * 0.5f + ofNoise(ofGetElapsedTimef() + 1000.f) * 2.f;
+		levelTitlePos.y = ofGetHeight() * 0.75f + ofNoise(ofGetElapsedTimef() * 2.f) * 10.f;
+		
+		font.drawString(levelStr, levelTitlePos.x, levelTitlePos.y);
+		ofPopStyle();
 	}
 	else {
 		iceCream.draw();

@@ -25,6 +25,7 @@
 #define CROP_RIGHT 540
 
 static const int N_WIN_IMAGES = 17;
+static const int N_MORE_IMAGES = 42;
 
 struct Level {
 	int levelN = 0;
@@ -111,6 +112,9 @@ public:
 	
 	ofImage winAnimation[N_WIN_IMAGES];		// win level star
 	int winIdx = -1;
+	
+	ofImage moreAnimation[N_MORE_IMAGES];
+	int moreIdx = -1;
 	
 	float levelTitleStartT = 0.f;
 	float levelTitleDur = 1.f;				// seconds
