@@ -141,4 +141,7 @@ public:
 	
 	bool bHasKinect, bDrawGui;
     ofVec2f tonguePos;
+	
+	ofVec2f kinectTipPos;
+	float kinectTipDepth;
 };

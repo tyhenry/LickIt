@@ -249,18 +249,18 @@ void ofApp::update(){
 				
 				tip = tongueOutlineSmooth.getClosestPoint(tipTarget);
 				tip.y += 10;
-				rawTip = tip;
+				kinectTipPos = tip;
 				
 				//get depth of tip
-				float d = kinect.getDistanceAt(tip.x, tip.y);
-				if (d > 0){
+				kinectTipDepth = kinect.getDistanceAt(tip.x, tip.y);
+				if (kinectTipDepth > 0){
 					
 					//cout << "raw tip depth: " << d;
 					//cout << ", raw tip x: " << tip.x << endl;
 					
 					// TODO: move to params
 					tip.x = ofMap(tip.x, kinectMinX, kinectMaxX, controlBoundsTL.get().x, controlBoundsBR.get().x, true);
-					tip.y = ofMap(d, kinectMinDepth, kinectMaxDepth, controlBoundsTL.get().y, controlBoundsBR.get().y, true);
+					tip.y = ofMap(kinectTipDepth, kinectMinDepth, kinectMaxDepth, controlBoundsTL.get().y, controlBoundsBR.get().y, true);
 					
 					tonguePos.set(tip);
 				}
@@ -425,12 +425,22 @@ void ofApp::draw(){
     
 	if (bDrawKinect){
 		
-		grayImage.draw(ofGetWidth()-480, 0, 480, 360);
-		contourFinder.draw(ofGetWidth()-480, 0, 480, 360);
+		ofPushMatrix();
+		ofTranslate(ofGetWidth()-480, 0);
+		ofScale(480.f/640.f, 480.f/640.f);
+		grayImage.draw(0, 0);
+		contourFinder.draw(0, 0);
+		ofSetColor(255,0,0);
+		ofDrawLine(kinectMinX, 0.f, kinectMinX, 360.f);
+		ofDrawLine(kinectMaxX, 0.f, kinectMaxX, 360.f);
+		ofDrawCircle(kinectTipPos, 3);
+		ofDrawBitmapStringHighlight(ofToString(kinectTipDepth), kinectTipPos.x+10, kinectTipPos.y+10, ofColor(255,0,0));
+		ofSetColor(255);
 //		tongueOutlineSmooth.draw();
 		//ofSetColor(tipDepth, tipDepth, 0);
 //		ofDrawCircle(tip, 5);
 		//ofSetColor(255);
+		ofPopMatrix();
 	}
 	
 	if (bDrawTongueTip){

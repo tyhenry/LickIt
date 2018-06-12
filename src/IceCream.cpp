@@ -25,10 +25,15 @@ IceCream::IceCream(){
 	// COLLIDERS
 	// positions relative to cone pos
 	
-	ofRectangle c0 = ofRectangle(150.f, 50.f, 150.f, 100.f);
-	ofRectangle c1 = ofRectangle(101.f, 150.f, 250.f, 80.f);
-	ofRectangle c2 = ofRectangle(57.f, 230.f, 350.f, 80.f);
-	ofRectangle c3 = ofRectangle(38.f, 310.f, 400.f, 70.f);
+//	ofRectangle c0 = ofRectangle(150.f, 50.f, 150.f, 100.f);
+//	ofRectangle c1 = ofRectangle(101.f, 150.f, 250.f, 80.f);
+//	ofRectangle c2 = ofRectangle(57.f, 230.f, 350.f, 80.f);
+//	ofRectangle c3 = ofRectangle(38.f, 310.f, 400.f, 70.f);
+	ofRectangle c0 = ofRectangle(300.f * scale, 100.f * scale, 300.f * scale, 200.f * scale);
+	ofRectangle c1 = ofRectangle(180.f * scale, 300.f * scale, 545.f * scale, 160.f * scale);
+	ofRectangle c2 = ofRectangle(130.f * scale, 460.f * scale, 670.f * scale, 150.f * scale);
+	ofRectangle c3 = ofRectangle(100.f * scale, 610.f * scale, 750.f * scale, 150.f * scale);
+
 	
 	colliders.emplace_back(c0, true);
 	colliders.emplace_back(c1, true);
