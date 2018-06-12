@@ -245,6 +245,43 @@ void IceCream::refill(){
 	refillIdx = 0;
 }
 
+void IceCream::reset(){
+	
+	lickState = 0;
+	lickMax = 10;	// 10 licks to finish
+	
+	lickAnimIdx = 0;
+	lickAnimEnd = ofMap(lickState, 0, lickMax, 0, N_ICECREAM_IMAGES-1, true);
+	
+	pos = origPos;
+	vel = ofVec2f(0.f);
+	
+	bDripDeath = false;
+	bAteCone = false;
+	
+	// melting
+	resetMelt();
+	
+	// toppings
+	bHasChocolate = false;
+	chocoLickIdx = -1;
+	
+	bHasSprinkles = false;
+	sprinkles.clear();
+	
+	// reset animations
+	refillIdx = -1;
+	chocoPourIdx = -1;
+	
+	bIsFilled = false;
+	bChocoPoured = false;
+	
+	iceCreamTint = ofColor(255);
+	
+	bPaused = false;
+	
+}
+
 void IceCream::resetMelt(){
 	bMelting = false;
 	meltIdx = 0;
@@ -402,41 +439,7 @@ void IceCream::loadAssets(){
 	coneFrontImg.load("cone_front.png");
 }
 
-void IceCream::reset(){
-	
-	lickState = 0;
-	lickMax = 10;	// 10 licks to finish
-	
-	lickAnimIdx = 0;
-	lickAnimEnd = ofMap(lickState, 0, lickMax, 0, N_ICECREAM_IMAGES-1, true);
-	
-	pos = origPos;
-	vel = ofVec2f(0.f);
-	bDripDeath = false;
-	bAteCone = false;
-	
-	// melting
-	resetMelt();
 
-	// toppings
-	bHasChocolate = false;
-	chocoLickIdx = -1;
-	
-	bHasSprinkles = false;
-	sprinkles.clear();
-	
-	// reset animations
-	refillIdx = -1;
-	chocoPourIdx = -1;
-	
-	bIsFilled = false;
-	bChocoPoured = false;
-	
-	iceCreamTint = ofColor(255);
-	
-	bPaused = false;
-
-}
 
 //void IceCream::level1(){
 ////    moveIncrement = 2;

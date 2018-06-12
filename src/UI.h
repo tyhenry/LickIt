@@ -8,7 +8,7 @@
 
 #include "ofMain.h"
 
-#define N_CLOSE_IMGS 16
+#define N_CLOSE_IMGS 12
 
 class UI {
 public:
@@ -31,6 +31,7 @@ public:
     
     ofImage lowerTeeth;
     ofImage upperTeeth;
+	ofImage teeth;
 	
 	ofImage closeAnimation[N_CLOSE_IMGS];
 	int closeIndex = -1;

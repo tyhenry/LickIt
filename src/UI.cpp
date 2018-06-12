@@ -12,14 +12,15 @@
 UI::UI(){
     lowerTeeth.load("UI/lowerTeeth.png");
     upperTeeth.load("UI/upperTeeth.png");
+	teeth.load("UI/teeth.png");
 	
 	// close animation
 	for (int i=0; i<N_CLOSE_IMGS; i++){
 		string imgNum = ofToString(i, 2, '0');
-		closeAnimation[i].load("UI/close_" + imgNum  + ".png");
+		closeAnimation[i].load("UI/teeth_close_" + imgNum  + ".png");
 	}
 	
-	closeFrameDelay = 1.f / 8.f;
+	closeFrameDelay = 1.f / 8.f;	// 8 fps
 }
 
 void UI::update(){
@@ -43,20 +44,14 @@ void UI::draw(){
 	// calc scaling and pos
 	ofVec2f wS = ofVec2f(ofGetWidth(), ofGetHeight());
 	float scaleFactor = wS.x/upperTeeth.getWidth();
-
-	ofVec2f uP = ofVec2f(0, -50);
-	ofVec2f uS = ofVec2f(wS.x, upperTeeth.getHeight() * scaleFactor);
-	ofVec2f lP = ofVec2f(0, wS.y - lowerTeeth.getHeight() + 200);
-	ofVec2f lS = ofVec2f(wS.x, lowerTeeth.getHeight() * scaleFactor);
 	
 	// draw teeth
 	if (closeIndex < 0 || closeIndex >= N_CLOSE_IMGS){
-		upperTeeth.draw(uP, uS.x, uS.y);
-		lowerTeeth.draw(lP, lS.x, lS.y);
+		teeth.draw(0,0, wS.x, teeth.getHeight() * scaleFactor);
 	}
 	else {
 		// draw mouth closing
-		if (closeIndex >= 0){
+		if (closeIndex >= 0 && closeIndex < N_CLOSE_IMGS){
 			auto& img = closeAnimation[closeIndex];
 			img.draw(0,0, wS.x,img.getHeight() * scaleFactor);
 		}

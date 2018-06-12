@@ -1329,17 +1329,17 @@
 		E4B69E1C0A3A1BDC003C02F2 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				78B4DD4C24FC54C8C74248AC /* Background.cpp */,
+				924AF3FA453349835ECBE466 /* Background.h */,
+				407F19B32275C7227DA8F6EB /* IceCream.cpp */,
+				407350A6CA5132E580E935BF /* IceCream.h */,
 				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
 				E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */,
 				E4B69E1F0A3A1BDC003C02F2 /* ofApp.h */,
-				407F19B32275C7227DA8F6EB /* IceCream.cpp */,
-				407350A6CA5132E580E935BF /* IceCream.h */,
+				DADCFF6BCCB3C112E5564F0B /* Tongue.cpp */,
 				583EF47A8486D60D29A1C034 /* Tongue.h */,
 				70EA92C8AFD3C5A528E48328 /* UI.cpp */,
-				924AF3FA453349835ECBE466 /* Background.h */,
 				1E0E44D3201F363FC612B597 /* UI.h */,
-				78B4DD4C24FC54C8C74248AC /* Background.cpp */,
-				DADCFF6BCCB3C112E5564F0B /* Tongue.cpp */,
 			);
 			path = src;
 			sourceTree = SOURCE_ROOT;

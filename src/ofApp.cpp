@@ -406,6 +406,7 @@ void ofApp::draw(){
 		ofDrawCircle(tip, 5);
 		//ofSetColor(255);
 	}
+	
 	if (bDrawTongueTip){
 		if (tongue.isLicking()){
 			ofSetColor(255,106,159);
