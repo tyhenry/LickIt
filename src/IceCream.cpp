@@ -208,6 +208,7 @@ void IceCream::lick(){
 	if (lickState == 1){
 		colliders[0].second = false;
 		if (bHasChocolate) chocoLickIdx = 1;
+        
 	}
 	else if (lickState == 3){
 		colliders[1].second = false;
@@ -341,7 +342,8 @@ void IceCream::draw(){
 			// draw toppings
 			if (bHasChocolate){
 				//if (chocoLickIdx >= 0 && chocoLickIdx < N_CHOCOLICK_IMAGES)
-					chocoLickAnimation[0].draw(pos, size.x, size.y);
+                drawChoco();
+					//chocoLickAnimation[0].draw(pos, size.x, size.y);
 			}
 			if (bHasSprinkles){
 				drawSprinkles();
@@ -373,7 +375,11 @@ void IceCream::drawSprinkles(){
 	}
 }
 
-
+void IceCream::drawChoco(){
+    if (lickState < N_CHOCOLICK_IMAGES){
+        chocoLickAnimation[lickState].draw(pos.x, pos.y + 10 * lickState, size.x, size.y);
+    }
+}
 void IceCream::drawColliders(){	// for debug
 	
 	ofPushStyle();

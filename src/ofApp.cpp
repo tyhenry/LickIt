@@ -163,8 +163,12 @@ void ofApp::update(){
     bg.update();
     iceCream.update();
 	
-	ofVec2f tonguePos = tongue.pos;
-	
+	// CONTROLLER POSITION
+
+    if(useMouse){
+        tonguePos = ofVec2f(ofGetMouseX(), ofGetMouseY());
+    }
+
 	// USE KINECT IF ATTACHED
 	
     if (bHasKinect && !bMouseControl){
@@ -496,6 +500,10 @@ void ofApp::keyPressed(int key){
 			bDrawGui = !bDrawGui;
 			break;
 			
+        case ('m'):
+            useMouse = !useMouse;
+            break;
+            
 			// REMOVED FOR GUI CONTROL:
 			
 //        case ('k'):

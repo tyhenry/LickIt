@@ -129,5 +129,6 @@ public:
 	ofParameter<bool> bDrawTongueTip, bDrawColliders;
 	
 	bool bHasKinect, bDrawGui;
-    
+    ofVec2f tonguePos;
+    bool useMouse = true;
 };

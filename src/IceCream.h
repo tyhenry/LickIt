@@ -48,6 +48,7 @@ public:
 
     void draw();
 	void drawSprinkles();
+    void drawChoco();
 	void drawColliders();	// debug
 	
 	void loadAssets();
