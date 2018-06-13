@@ -27,6 +27,7 @@ public:
 			closeIndex = N_CLOSE_IMGS - 1;
 		}
 		bMouthClosed = !open;
+        ofLogNotice("UI") << "mouth " << (bMouthClosed ? "closed" : "opened");
 	}
     
     ofImage lowerTeeth;

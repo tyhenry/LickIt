@@ -47,9 +47,7 @@ IceCream::IceCream(){
     winSound.setVolume(0.85f);
     winSound.setMultiPlay(false);
     
-    loseSound.load("sounds/lose.wav");
-    loseSound.setVolume(0.85f);
-    loseSound.setMultiPlay(false);
+
 	
 	
 	// SETUP
@@ -326,7 +324,10 @@ void IceCream::draw(){
 	
 	// empty / refilling
 	if (!isFilled()){
-		coneImg.draw(pos, size.x, size.y);	// empty cone
+        // empty cone
+		coneImg.draw(pos, size.x, size.y);
+        
+        // refill
 		ofPushStyle();
 		ofSetColor(iceCreamTint);
 		if (refillIdx >= 0 && refillIdx < N_REFILL_IMAGES){
@@ -348,9 +349,7 @@ void IceCream::draw(){
 			
 			// draw toppings
 			if (bHasChocolate){
-				//if (chocoLickIdx >= 0 && chocoLickIdx < N_CHOCOLICK_IMAGES)
                 drawChoco();
-					//chocoLickAnimation[0].draw(pos, size.x, size.y);
 			}
 			if (bHasSprinkles){
 				drawSprinkles();
@@ -367,7 +366,9 @@ void IceCream::draw(){
 			}
 		} else {
 			if (bHasChocolate) {
-				chocoPourAnimation[chocoPourIdx].draw(pos, size.x, size.y);
+                if (chocoPourIdx >=0 && chocoPourIdx < N_CHOCOPOUR_IMAGES){
+                    chocoPourAnimation[chocoPourIdx].draw(pos, size.x, size.y);
+                }
 			}
 		}
 	}

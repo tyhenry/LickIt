@@ -44,12 +44,15 @@ void ofApp::setup(){
 	winSound.load("sounds/win.wav");
 	winSound.setMultiPlay(false);
 	winSound.setVolume(lickVolume);
+    
+    loseSound.load("sounds/lose.wav");
+    loseSound.setVolume(0.85f);
+    loseSound.setMultiPlay(false);
 
 	music.load("sounds/ICE CREAM LICK (Original Mix) - Final Mix 1 - Siyoung 2015 (24 Bit MSTR).wav");
 	music.setLoop(true);
 	musicVolume.set("music volume", 0.7f, 0.0f, 1.0f);
 	music.setVolume(musicVolume);
-    music.play();
 	
 	// ANIMATIONS
 	
@@ -61,53 +64,75 @@ void ofApp::setup(){
 	for(int i =0; i < N_MORE_IMAGES; i++){
 		moreAnimation[i].load("level_title/more_" + ofToString(i, 2, '0') + ".png");
 	}
+    // game over anim
+    for(int i =0; i < N_GAME_OVER_IMAGES; i++){
+        gameOverAnimation[i].load("game_over/gameover_title_" + ofToString(i, 2, '0') + ".png");
+    }
+    // lick it title anim
+    for(int i =0; i < N_TITLE_IMAGES; i++){
+        titleAnimation[i].load("lickit_title/lickit_title_" + ofToString(i, 2, '0') + ".png");
+    }
 	
 	// ADD LEVELS
 	
 	Level l0;
 	l0.meltDuration = 194.5f;
+    l0.levelN = 0;
+    l0.iceCreamTint = ofColor(0,0,255);
 	levels.push_back(l0);
+    
 	Level l1;
 	l1.tongueVel = ofVec2f(0.5f, 0.f);
+    l1.meltDuration = 10.f;
 	l1.levelN = 1;
 	levels.push_back(l1);
+    
 	Level l2;
 	l2.tongueVel = ofVec2f(-0.5f, 0.f);
-	l2.meltDuration = 7.f;
-	l2.bHasChocolate = true;
+	l2.meltDuration = 9.f;
+    l2.numSprinkles = 15;
 	l2.levelN = 2;
 	levels.push_back(l2);
+    
 	Level l3;
-	l3.tongueVel = ofVec2f(2.f, 0.f);
-	l3.meltDuration = 6.f;
-	l3.numSprinkles = 15;
+	l3.tongueVel = ofVec2f(0.75f, 0.f);
+	l3.meltDuration = 8.f;
+    l3.bHasChocolate = true;
 	l3.levelN = 3;
 	levels.push_back(l3);
+    
 	Level l4;
-	l4.tongueVel = ofVec2f(-2.f, 0.f);
-	l4.meltDuration = 5.f;
+	l4.tongueVel = ofVec2f(-.75f, 0.f);
+	l4.meltDuration = 7.f;
 	l4.bHasChocolate = true;
 	l4.numSprinkles = 15;
+    l4.iceCreamTint = ofColor(255,170,220); // strawberry
 	l4.levelN = 4;
 	levels.push_back(l4);
+    
 	Level l5;
-	l5.tongueVel = ofVec2f(3.f, 1.f);
-	l5.meltDuration = 4.f;
+	l5.tongueVel = ofVec2f(1.f, .25f);
+	l5.meltDuration = 7.f;
 	l5.bHasChocolate = true;
 	l5.numSprinkles = 20;
-	l5.iceCreamTint = ofColor(240,130,0);	// strawberry?
+    l5.iceCreamTint = ofColor(92,51,23);   // chocolate
 	l5.levelN = 5;
 	levels.push_back(l5);
+    
 	for (int i=6; i<100; i++){
 		Level l;
-		l.tongueVel.x = ofMap(i, 6, 100, 3.f, 10.f);
-		l.tongueVel.y = ofMap(i, 6, 100, 1.f, 5.f);
+		l.tongueVel.x = ofMap(i, 6, 100, 1.25f, 5.f);
+		l.tongueVel.y = ofMap(i, 6, 100, .3f, 2.f);
 		if (i%2==0) l.tongueVel *= -1;	// reverse dir
-		l.meltDuration = ofMap(i, 6, 100, 4.f, 1.f);
+        
+		l.meltDuration = ofMap(i, 6, 100, 6.5f, 2.5f);
 		l.bHasChocolate = true;
 		l.numSprinkles = ofMap(i, 6, 100, 20, 40);
+        
 		float hue = ofRandom(0, 255);
+        float brt = ofRandom(100,255);
 		l.iceCreamTint = ofColor::fromHsb(hue, 200, 255);
+        
 		l.levelN = i;
 		levels.push_back(l);
 	}
@@ -306,14 +331,25 @@ void ofApp::update(){
 			iceCream.pause(true);
 			bGameOver = true;
 			teeth.beginClose(8.f);
-		} else {
-			if (teeth.bMouthClosed){
-				
-				// TODO: init game over screen
-				
-				teeth.setMouthOpen(true);
-				restart();
-			}
+            music.stop();
+            loseSound.play();
+            
+            bGameOverDraw = true;
+            gameOverStartT = ofGetElapsedTimef();
+        } else {
+            
+            if (bGameOverDraw){
+                gameOverIdx = ofMap(ofGetElapsedTimef(), gameOverStartT, gameOverStartT+gameOverAnimDur, 0, N_GAME_OVER_IMAGES-1, true);
+                if (gameOverIdx == N_GAME_OVER_IMAGES-1){
+                    
+                    teeth.setMouthOpen(true);
+                    
+                    bGameOverDraw = false;
+                    gameOverIdx = -1;
+                    
+                    restart();
+                }
+            }
 		}
 	}
 	
@@ -351,7 +387,7 @@ void ofApp::update(){
 			bLevelIntro = false;	// intro done
 		}
 	}
-	else if (!bGameOver) {
+	else if (!bGameOver && !bLickItTitle) {
 		
 		// check if tongue is giving a lick
 
@@ -366,8 +402,8 @@ void ofApp::update(){
 					bIsLicking = true;
 					lickSound.play();
 					
-					ofLogNotice("ofApp")	<< "licked!" << endl
-					<< "\t\t lick: " << iceCream.lickState << " / " << iceCream.lickMax
+					ofLogNotice("ofApp")	<< "licked!"
+					<< "\t lick: " << iceCream.lickState << " / " << iceCream.lickMax
 					<< ", total licks: " << lickCounter;
 				}
 			}
@@ -375,10 +411,22 @@ void ofApp::update(){
 		else if (tongue.isMovingDown()){
 			bIsLicking = false;
 		}
-	}
+    }
 	
-	
-	iceCream.update();
+    
+    if (bLickItTitle){
+        float t = ofGetElapsedTimef();
+        titleIdx = ofMap(t, titleStartT, titleStartT + titleAnimDur, 0, N_TITLE_IMAGES-1, true);
+        if (t - titleAnimDur >= titleStartT){
+            bLickItTitle = false;
+            
+            iceCream.refill();
+            
+
+        }
+    }
+
+    else { iceCream.update(); }
 	
 	teeth.update();
 
@@ -414,14 +462,28 @@ void ofApp::draw(){
 		
 		font.drawString(levelStr, levelTitlePos.x, levelTitlePos.y);
 		ofPopStyle();
-	}
+    }
+    else if (bLickItTitle){
+        if (titleIdx >= 0 && titleIdx < N_TITLE_IMAGES){
+            titleAnimation[titleIdx].draw(0,0,ofGetWidth(), ofGetHeight());
+        }
+    }
 	else {
+
 		iceCream.draw();
+        
+
 	}
 	
 	// DRAW TEETH over ice cream
 	
     teeth.draw();
+    
+    if (bGameOverDraw){
+        if (gameOverIdx >= 0 && gameOverIdx < N_GAME_OVER_IMAGES){
+            gameOverAnimation[gameOverIdx].draw(0,0,ofGetWidth(),ofGetHeight());
+        }
+    }
     
 	if (bDrawKinect){
 		
@@ -471,16 +533,24 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::restart(){
-	iceCream.refill();
 	
 	bIsLicking = false;
 	levelNum = 0;
 	
 	music.setPosition(0.f);	// restart music
+    music.play();
 	bLevelIntro = true;
 	bDrawWin = false;
 	bDrawLevelTitle = false;
 	bGameOver = false;
+    
+    iceCream.bAteCone = false;
+    iceCream.bDripDeath = false;
+    
+    // title screen
+    bLickItTitle = true;
+    titleIdx = 0;
+    titleStartT = ofGetElapsedTimef();
 	
 	winIdx = -1;
 	lickCounter = 0;

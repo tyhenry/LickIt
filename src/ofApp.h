@@ -26,6 +26,8 @@
 
 static const int N_WIN_IMAGES = 17;
 static const int N_MORE_IMAGES = 42;
+static const int N_GAME_OVER_IMAGES = 33;
+static const int N_TITLE_IMAGES = 44;
 
 struct Level {
 	int levelN = 0;
@@ -102,7 +104,7 @@ public:
     
 	// AUDIO
 	
-	ofSoundPlayer lickSound, winSound, gameOverSound;
+	ofSoundPlayer lickSound, winSound, loseSound;
     ofSoundPlayer music;
 	
 	// ANIMATIONS
@@ -118,6 +120,18 @@ public:
 	
 	float levelTitleStartT = 0.f;
 	float levelTitleDur = 1.f;				// seconds
+    
+    ofImage gameOverAnimation[N_GAME_OVER_IMAGES];
+    int gameOverIdx = -1;
+    float gameOverAnimDur = 4.f;
+    float gameOverStartT = 0.f;
+    bool bGameOverDraw;
+    
+    ofImage titleAnimation[N_TITLE_IMAGES];
+    int titleIdx = -1;
+    bool bLickItTitle;
+    float titleAnimDur = 4.f;
+    float titleStartT = 0.f;
 	
 	// PARAMS
 	

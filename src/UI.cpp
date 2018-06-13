@@ -33,7 +33,7 @@ void UI::update(){
 			if (closeIndex >= N_CLOSE_IMGS){
 				closeIndex = N_CLOSE_IMGS - 1;
 				bMouthClosed = true;
-				cout << "mouth closed" << endl;
+                ofLogNotice("UI") << "mouth closed";
 			}
 		}
 	}
