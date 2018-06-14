@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SETTINGS>
+	<CONTROLLER_PARAMS>
+		<mouse_control>0</mouse_control>
+		<draw_kinect>0</draw_kinect>
+		<kinect_near_thresh>213</kinect_near_thresh>
+		<kinect_far_thresh>147</kinect_far_thresh>
+		<kinect_min_depth>1326</kinect_min_depth>
+		<kinect_max_depth>1908</kinect_max_depth>
+		<kinect_min_x>199.184</kinect_min_x>
+		<kinect_max_x>421.224</kinect_max_x>
+		<control_bounds_TL>250.696, 292.828</control_bounds_TL>
+		<control_bounds_BR>1630.12, 1029.33</control_bounds_BR>
+		<ice_cream_bounds_TL>288, 249.912</ice_cream_bounds_TL>
+		<ice_cream_bounds_BR>1632, 1128.54</ice_cream_bounds_BR>
+		<kinect_ROI_TL>156.868, 30.1874</kinect_ROI_TL>
+		<kinect_ROI_BR>456.743, 352.553</kinect_ROI_BR>
+	</CONTROLLER_PARAMS>
+	<SOUND_PARAMS>
+		<lick_volume>0.85</lick_volume>
+		<music_volume>0.7</music_volume>
+	</SOUND_PARAMS>
+	<VIZ_PARAMS>
+		<bg_fps>7</bg_fps>
+		<draw_tongue_tip>1</draw_tongue_tip>
+	</VIZ_PARAMS>
+</SETTINGS>

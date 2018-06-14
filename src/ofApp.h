@@ -141,7 +141,7 @@ public:
 	ofParameter<int> kinectNearThresh, kinectFarThresh;
 	ofParameter<int> kinectMinDepth, kinectMaxDepth;
 	ofParameter<float> kinectMinX, kinectMaxX;
-	ofParameter<ofVec2f> kinectRoiTL, kinectRoiBR;
+    ofParameter<glm::vec2> kinectRoiTL, kinectRoiBR;
 	ofParameter<bool> bUseKinect, bDrawKinect, bMouseControl;
 	ofParameter<glm::vec2> controlBoundsTL, controlBoundsBR;
 	ofParameter<glm::vec2> frameBoundsTL, frameBoundsBR;

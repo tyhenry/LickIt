@@ -12,8 +12,8 @@ void ofApp::setup(){
 	
 	kinectNearThresh.set("kinect near thresh", 225, 0, 255);
 	kinectFarThresh.set("kinect far thresh", 147, 0, 255);
-	kinectRoiTL.set("kinect ROI TL", ofPoint(100,100), ofPoint(0,0), ofPoint(640,480));
-	kinectRoiBR.set("kinect ROI BR", ofPoint(540,360), ofPoint(0,0), ofPoint(640,480));
+    kinectRoiTL.set("kinect ROI TL", glm::vec2(100,100), glm::vec2(0,0), glm::vec2(640,480));
+	kinectRoiBR.set("kinect ROI BR", glm::vec2(540,360), glm::vec2(0,0), glm::vec2(640,480));
 	bUseKinect.set("use kinect", bHasKinect);
 	bDrawKinect.set("draw kinect", false);
 	
@@ -153,8 +153,8 @@ void ofApp::setup(){
 	controllerParams.add(bDrawKinect);
 	controllerParams.add(kinectNearThresh);
 	controllerParams.add(kinectFarThresh);
-//	controllerParams.add(kinectRoiTL);
-//	controllerParams.add(kinectRoiBR);
+	controllerParams.add(kinectRoiTL);
+	controllerParams.add(kinectRoiBR);
 	controllerParams.add(kinectMinDepth.set("kinect min depth", 1050, 0, 2000));
 	controllerParams.add(kinectMaxDepth.set("kinect max depth", 1800, 0, 2000));
 	controllerParams.add(kinectMinX.set("kinect min x", 240, 0, 640));
@@ -196,7 +196,7 @@ void ofApp::setup(){
 	iceCream.setFrameBounds(rect);
 	
 	restart();
-	
+    gui.loadFromFile("settings.xml");
 }
 
 //--------------------------------------------------------------
@@ -230,7 +230,7 @@ void ofApp::update(){
             grayThreshFar.threshold(kinectFarThresh);
             cvAnd(grayThreshNear.getCvImage(), grayThreshFar.getCvImage(), grayImage.getCvImage(), NULL);
             
-			auto pix = grayImage.getPixels();
+			auto& pix = grayImage.getPixels();
 			
 			
 			// CROP KINECT IMAGE
@@ -488,6 +488,7 @@ void ofApp::draw(){
 	if (bDrawKinect){
 		
 		ofPushMatrix();
+        ofPushStyle();
 		ofTranslate(ofGetWidth()-480, 0);
 		ofScale(480.f/640.f, 480.f/640.f);
 		grayImage.draw(0, 0);
@@ -498,10 +499,15 @@ void ofApp::draw(){
 		ofDrawCircle(kinectTipPos, 3);
 		ofDrawBitmapStringHighlight(ofToString(kinectTipDepth), kinectTipPos.x+10, kinectTipPos.y+10, ofColor(255,0,0));
 		ofSetColor(255);
+        ofRectangle roi = ofRectangle(kinectRoiTL, kinectRoiBR);
+        ofNoFill();
+        ofDrawRectangle(roi);
 //		tongueOutlineSmooth.draw();
 		//ofSetColor(tipDepth, tipDepth, 0);
 //		ofDrawCircle(tip, 5);
 		//ofSetColor(255);
+        ofSetColor(255);
+        ofPopStyle();
 		ofPopMatrix();
 	}
 	
@@ -518,7 +524,7 @@ void ofApp::draw(){
 	
 	if (bDrawGui){
 		gui.draw();
-		
+        ofShowCursor();
 		iceCream.drawColliders();
 		
 		// draw ice cream frame bounds
@@ -528,7 +534,9 @@ void ofApp::draw(){
 		ofDrawRectangle(iceCream.frameBounds);
 		ofDrawBitmapStringHighlight("ice cream bounds", iceCream.frameBounds.getTopLeft()+glm::vec2(0,20), ofColor(0,0,255));
 		ofPopStyle();
-	}
+    } else {
+        ofHideCursor();
+    }
 }
 
 //--------------------------------------------------------------
